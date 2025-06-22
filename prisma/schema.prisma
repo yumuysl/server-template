@@ -1,0 +1,63 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id          Int            @id @default(autoincrement()) @db.UnsignedInt
+  username    String         @unique(map: "username") @db.VarChar(50)
+  nickname    String?        @default("番茄用户") @db.VarChar(50)
+  password    String         @db.Text
+  avatar      String?        @db.LongText
+  email       String?        @db.VarChar(50)
+  mobile      String?        @db.VarChar(50)
+  role_id     Int?           @db.UnsignedInt
+  status      User_status?   @default(Y)
+  ban_start   DateTime?      @db.DateTime(0)
+  ban_end     DateTime?      @db.DateTime(0)
+  is_active   User_is_active @default(Y)
+  create_time DateTime       @db.DateTime(0)
+  update_time DateTime       @db.DateTime(0)
+  role        role?          @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "role_id")
+
+  @@index([id], map: "id")
+  @@index([role_id], map: "role_id")
+}
+
+model role {
+  id          Int            @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+  name        String         @db.VarChar(50)
+  description String?        @db.VarChar(50)
+  auth_list   Json
+  is_active   Role_is_active @default(Y)
+  create_time DateTime       @db.DateTime(0)
+  update_time DateTime       @db.DateTime(0)
+  user        user[]
+}
+
+model auth {
+  id          Int     @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+  pagename    String? @db.VarChar(50)
+  permission  String? @db.Text
+  description String? @db.VarChar(50)
+}
+
+enum User_status {
+  N @map("0")
+  Y @map("1")
+}
+
+enum User_is_active {
+  N @map("0")
+  Y @map("1")
+}
+
+enum Role_is_active {
+  N @map("0")
+  Y @map("1")
+}
