@@ -39,9 +39,17 @@ router.get('/', async(req, res) => {
       offset: (query && (query.currentPage - 1) * ( query.limit || 10)) || 0,
       limit: (query && query.limit) || 10
     }
-    if(query && query.title){
-      filters.title = {
-        contains: query.title
+    for(let key of Object.keys(query)){
+      if(['username', 'nickname', 'email'].includes(key)){
+        filters[key] = {
+          contains: query[key]
+        }
+      }
+      if(['role_id'].includes(key)){
+        filters[key] = parseInt(query[key])
+      }
+      if(['status'].includes(key)){
+        filters[key] = query[key]
       }
     }
  
